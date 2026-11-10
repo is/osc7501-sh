@@ -61,6 +61,6 @@ The message format is `ESC ] 7501 ; key=value[:key=value...] ST`. The `state` fi
 
 ## License
 
-No license has been specified yet.
+This project is licensed under the GNU General Public License, version 3 or any later version (GPL-3.0-or-later). See [LICENSE](LICENSE) for the full text.
 
 中文说明见 [README-cn.md](README-cn.md).

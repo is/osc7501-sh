@@ -59,6 +59,6 @@ osc7501 working --msg '处理中' --printable
 
 OSC 7501 格式为 `ESC ] 7501 ; key=value[:key=value...] ST`。`state` 必填；`msg` 使用 Base64 编码。终端需支持 OSC 7501 才会展示状态。
 
-## 许可
+## 许可证
 
-尚未指定许可证。
+本项目采用 GNU 通用公共许可证第 3 版或更高版本（GPL-3.0-or-later）。完整文本请参阅 [LICENSE](LICENSE)。
