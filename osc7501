@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""Generate OSC 7501 Program Status Protocol sequences."""
+import argparse
+import base64
+import os
+import re
+import sys
+
+STATES = {"idle", "working", "done", "blocked", "error", "clear"}
+SAFE = re.compile(r"^[A-Za-z0-9_. ,+/=-]*$")
+
+
+def main():
+    p = argparse.ArgumentParser(description="Generate an OSC 7501 status sequence")
+    p.add_argument("state", choices=sorted(STATES), help="program state")
+    p.add_argument("--id", dest="record_id", help="record path, e.g. build/test")
+    p.add_argument("--kind", choices=["permission", "question", "auth"], help="blocked reason")
+    p.add_argument("--app", help="application name")
+    p.add_argument("--title", help="short record title")
+    p.add_argument("--msg", help="message text (encoded as base64)")
+    p.add_argument("--bel", action="store_true", help="use BEL terminator instead of ST")
+    p.add_argument("--printable", action="store_true", help="print escape bytes as readable notation")
+    a = p.parse_args()
+    if a.kind and a.state != "blocked":
+        p.error("--kind is only valid with state=blocked")
+    pairs = ["state=" + a.state]
+    for key, value in (("id", a.record_id), ("kind", a.kind), ("app", a.app), ("title", a.title)):
+        if value is not None:
+            if not SAFE.fullmatch(value):
+                p.error(f"{key} contains characters not allowed by OSC 7501")
+            pairs.append(f"{key}={value}")
+    if a.msg is not None:
+        pairs.append("msg=" + base64.b64encode(a.msg.encode("utf-8")).decode("ascii"))
+    sequence = "\x1b]7501;" + ":".join(pairs) + ("\x07" if a.bel else "\x1b\\")
+    if a.printable:
+        sequence = sequence.replace("\x1b", "ESC").replace("\x07", "BEL")
+    sys.stdout.write(sequence + "\n")
+
+
+if __name__ == "__main__":
+    main()
